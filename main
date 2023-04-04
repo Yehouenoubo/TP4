@@ -1,0 +1,144 @@
+import arcade
+import random
+
+# Je définis la taille de l'écran
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+# Liste pour les couleurs
+COLORS = [arcade.color.BLUE, arcade.color.FANDANGO_PINK,
+          arcade.color.FRENCH_ROSE, arcade.color.GOLDEN_POPPY]
+
+
+# Création d'une classe Balle
+class Balle():
+
+    # Initialisation du rayon, centre x, centre y et couleur
+    def __init__(self, x, y, change_x, change_y, rayon, color):
+        self.x = x
+        self.y = y
+        self.change_x = change_x
+        self.change_y = change_y
+        self.rayon = rayon
+        self.color = color
+
+    # Méthode update pour faire bouger la balle
+    def update(self):
+        self.x += self.change_x
+        self.y += self.change_y
+        if self.x < self.rayon:
+            self.change_x *= -1
+        if self.x > SCREEN_WIDTH - self.rayon:
+            self.change_x *= -1
+        if self.y < self.rayon:
+            self.change_y *= -1
+        if self.y > SCREEN_HEIGHT - self.rayon:
+            self.change_y *= -1
+
+    # On dessine la Balle
+    def draw(self):
+        arcade.draw_circle_filled(self.x, self.y, self.rayon, self.color)
+
+
+# Création d'une classe Rectangle
+class Rectangle:
+
+    # Initialisation du rayon, centre x, centre y et couleur
+    def __init__(self, x, y, change_x, change_y, width, height, color, angle):
+        self.x = x
+        self.y = y
+        self.change_x = change_x
+        self.change_y = change_y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.angle = angle
+
+    def update(self):
+        self.x += self.change_x
+        self.y += self.change_y
+        if self.x + self.width / 2 > SCREEN_WIDTH or self.x - self.width / 2 < 0:
+            self.change_x *= -1
+        if self.y + self.height / 2 > SCREEN_HEIGHT or self.y - self.height / 2 < 0:
+            self.change_y *= -1
+
+    def draw(self):
+        arcade.draw_rectangle_filled(self.x, self.y, self.width, self.height, self.color, self.angle)
+
+
+#Classe Mygames
+class MyGame(arcade.Window):
+    def __init__(self):
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Exercice #1")
+        self.liste_cercles = []
+        self.liste_rectangles = []
+
+    #on définie les variavles de bases pour dessiner la balle et le rectangle
+    def setup(self):
+        for i in range(0):
+            rayon = random.randint(10, 30)
+            width = random.randint(20, 60)
+            height = random.randint(20, 60)
+            angle = random.randint(45,90)
+            change_x = 4
+            change_y = 4
+            center_x = random.randint(0 + rayon, SCREEN_WIDTH - rayon)
+            center_y = random.randint(0 + rayon, SCREEN_HEIGHT - rayon)
+            color = random.choice(COLORS)
+            cercle = Balle(center_x, center_y, 4,4, rayon,color)
+            rectangle = Rectangle(center_x, center_y, change_x, change_y, width, height, color, angle)
+            self.liste_cercles.append(cercle)
+            self.liste_rectangles.append(rectangle)
+
+    #On dessine le rectangle et le cercle
+    def on_draw(self):
+        arcade.start_render()
+        for cercle in self.liste_cercles:
+            cercle.draw()
+        for rectangle in self.liste_rectangles:
+            rectangle.draw()
+
+    # Méthode On_update pour le changement de vitesse
+    def on_update(self, delta_time: float):
+        arcade.start_render()
+        for cercle in self.liste_cercles:
+            cercle.update()
+        for rectangle in self.liste_rectangles:
+            rectangle.update()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+
+        # Si on clique sur la souris gauche, ca cree un nouvel balle
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            for i in range(1):
+                rayon = random.randint(10, 30)
+                change_x = 4
+                change_y = 4
+                center_x = x
+                center_y = y
+                color = random.choice(COLORS)
+                cercle = Balle(center_x, center_y, 4, 4, rayon, color)
+                self.liste_cercles.append(cercle)
+
+
+        # Si on clique sur la souris droite, ca cree un nouveau rectangle
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            for i in range(1):
+                width = random.randint(10, 50)
+                height = random.randint(10, 50)
+                angle = random.randint(45, 90)
+                change_x = 4
+                change_y = 4
+                center_x = x
+                center_y = y
+                color = random.choice(COLORS)
+                rectangle = Rectangle(center_x, center_y, change_x, change_y, width, height, color, angle)
+                self.liste_rectangles.append(rectangle)
+
+
+def main():
+    Window = MyGame()
+    Window.setup()
+    arcade.run()
+
+main()
